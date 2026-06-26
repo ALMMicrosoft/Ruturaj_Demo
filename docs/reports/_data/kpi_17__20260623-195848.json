@@ -1,0 +1,125 @@
+{
+  "module": "kpi_17",
+  "project": "Cybage — ALMCybage",
+  "generatedAt": "2026-06-23 19:58:48",
+  "argv": [],
+  "kpi": {
+    "num": 17,
+    "name": "Rework Rate (AI-Attributed)",
+    "index": "Quality",
+    "definition": "% of AI-assisted code changes that require substantial revision shortly after creation (>1% of lines reworked within 48h), indicating poor first-pass AI code quality.",
+    "how_measured": "Identify AI-assisted PRs whose follow-up commits modify >1% of the original lines within 48 hours; divide by total AI-assisted PRs x 100.",
+    "formula": "(AI-assisted PRs with >1% line rework within 48h / Total AI-assisted PRs) x 100",
+    "unit": "%",
+    "cadence": "Weekly",
+    "direction": "lower-better (banded)",
+    "interpretation": "<5%=Excellent; 5-10%=Acceptable; 10-15%=Needs improvement; >15%=Critical",
+    "tools": "GitHub (PRs/Commits). AI attribution + rework baseline are documented PROXIES; the spec methodology is In-Progress.",
+    "plain": "Of the AI-written pull requests (merged or not), what share had more than 1% of their original lines rewritten within 2 days - a sign the AI code needed quick fixing. LOWER is better.",
+    "steps": [
+      "Take the DENOMINATOR: total AI-assisted PRs in scope, merged OR not (author is an AI agent, or a commit carries an AI trailer; generic bots excluded).",
+      "For each, baseline = the PR's first commit's added lines, and open a 48h window from that first commit.",
+      "Sum the lines changed by the PR's later commits inside that window (rework LOC).",
+      "Mark the PR reworked if rework LOC / baseline > 1%.",
+      "NUMERATOR = reworked PRs. Result = numerator / denominator x 100. If no AI PR was found (denominator = 0) the KPI is NOT COMPUTABLE for the scope."
+    ]
+  },
+  "computable": true,
+  "result": 0.0,
+  "datapoints": [
+    {
+      "label": "Total AI-assisted PRs (denominator)",
+      "source": "GET /orgs/{org}/repos -> per repo GET /pulls (state=all) -> keep PRs that are AI-attributed (author or commit-trailer).",
+      "value": 2.0,
+      "ok": true,
+      "error": null,
+      "raw": {
+        "scope": "org:ALMCybage (12 repos)",
+        "repos_scanned": 12,
+        "repos_with_prs": 4,
+        "prs_scanned": 17,
+        "window_hours": 48,
+        "rework_threshold_pct": 1,
+        "total_ai_assisted_prs": 2,
+        "reworked_prs": 0,
+        "detail": [
+          {
+            "repo": "ALMCybage/26074_BranchRuleset_Demo",
+            "pr": 8,
+            "title": "Add CodeQL SAST scanning to Backend CI workflow",
+            "author": "Copilot",
+            "author_kind": "AI-AGENT",
+            "merged": true,
+            "state": "closed",
+            "baseline_original_loc": 0,
+            "followup_commits_48h": 1,
+            "rework_loc": 23,
+            "revision_pct": 0.0,
+            "reworked": false
+          },
+          {
+            "repo": "ALMCybage/doctor-java-sha",
+            "pr": 2,
+            "title": "Add CodeQL SAST scanning to CI pipeline",
+            "author": "Copilot",
+            "author_kind": "AI-AGENT",
+            "merged": true,
+            "state": "closed",
+            "baseline_original_loc": 0,
+            "followup_commits_48h": 1,
+            "rework_loc": 40,
+            "revision_pct": 0.0,
+            "reworked": false
+          }
+        ]
+      }
+    },
+    {
+      "label": "AI-assisted PRs reworked >1% within 48h (numerator)",
+      "source": "For each AI PR: GET /pulls/{n}/commits -> first commit additions = baseline; sum later commits' line deltas (GET /commits/{sha}) within 48h; reworked if changed/baseline > 1%.",
+      "value": 0.0,
+      "ok": true,
+      "error": null,
+      "raw": {
+        "scope": "org:ALMCybage (12 repos)",
+        "repos_scanned": 12,
+        "repos_with_prs": 4,
+        "prs_scanned": 17,
+        "window_hours": 48,
+        "rework_threshold_pct": 1,
+        "total_ai_assisted_prs": 2,
+        "reworked_prs": 0,
+        "detail": [
+          {
+            "repo": "ALMCybage/26074_BranchRuleset_Demo",
+            "pr": 8,
+            "title": "Add CodeQL SAST scanning to Backend CI workflow",
+            "author": "Copilot",
+            "author_kind": "AI-AGENT",
+            "merged": true,
+            "state": "closed",
+            "baseline_original_loc": 0,
+            "followup_commits_48h": 1,
+            "rework_loc": 23,
+            "revision_pct": 0.0,
+            "reworked": false
+          },
+          {
+            "repo": "ALMCybage/doctor-java-sha",
+            "pr": 2,
+            "title": "Add CodeQL SAST scanning to CI pipeline",
+            "author": "Copilot",
+            "author_kind": "AI-AGENT",
+            "merged": true,
+            "state": "closed",
+            "baseline_original_loc": 0,
+            "followup_commits_48h": 1,
+            "rework_loc": 40,
+            "revision_pct": 0.0,
+            "reworked": false
+          }
+        ]
+      }
+    }
+  ]
+}

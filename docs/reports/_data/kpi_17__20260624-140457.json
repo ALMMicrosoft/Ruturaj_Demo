@@ -1,0 +1,47 @@
+{
+  "module": "kpi_17",
+  "project": "Cybage — ALMCybage",
+  "generatedAt": "2026-06-24 14:04:57",
+  "argv": [],
+  "kpi": {
+    "num": 17,
+    "name": "Rework Rate (AI-Attributed)",
+    "index": "Quality",
+    "definition": "% of AI-assisted code changes that require substantial revision shortly after creation (>50% of lines reworked within 48h), indicating poor first-pass AI code quality.",
+    "how_measured": "Identify AI-assisted PRs whose follow-up commits modify >50% of the original lines within 48 hours; divide by total AI-assisted PRs x 100.",
+    "formula": "(AI-assisted PRs with >50% line rework within 48h / Total AI-assisted PRs) x 100",
+    "unit": "%",
+    "cadence": "Weekly",
+    "direction": "lower-better (banded)",
+    "interpretation": "<5%=Excellent; 5-10%=Acceptable; 10-15%=Needs improvement; >15%=Critical",
+    "tools": "GitHub (PRs/Commits). AI attribution + rework baseline are documented PROXIES; the spec methodology is In-Progress.",
+    "plain": "Of the AI-written pull requests (merged or not), what share had more than 50% of their original lines rewritten within 2 days - a sign the AI code needed quick fixing. LOWER is better.",
+    "steps": [
+      "Take the DENOMINATOR: total AI-assisted PRs in scope, merged OR not (author is an AI agent, or a commit carries an AI trailer; generic bots excluded).",
+      "Open a 48h window from the PR's first commit; baseline = SUM of every in-window commit's ADDED lines (generation, any author - survives an empty first commit).",
+      "Rework LOC = SUM of the later commits' DELETED lines in that window (existing lines removed/rewritten, by anyone); pure additions are generation, not rework.",
+      "Mark the PR reworked if rework LOC / baseline > 50%.",
+      "NUMERATOR = reworked PRs. Result = numerator / denominator x 100. If no AI PR was found (denominator = 0) the KPI is NOT COMPUTABLE for the scope."
+    ]
+  },
+  "computable": false,
+  "result": null,
+  "datapoints": [
+    {
+      "label": "Total AI-assisted PRs (denominator)",
+      "source": "GET /orgs/{org}/repos -> per repo GET /pulls (state=all) -> keep PRs that are AI-attributed (author or commit-trailer).",
+      "value": null,
+      "ok": false,
+      "error": "",
+      "raw": null
+    },
+    {
+      "label": "AI-assisted PRs reworked >50% within 48h (numerator)",
+      "source": "For each AI PR: GET /pulls/{n}/commits -> baseline = sum of additions across in-window commits; rework = sum of later commits' deletions (GET /commits/{sha}.stats.deletions) within 48h; reworked if deletions/baseline > 50%.",
+      "value": null,
+      "ok": false,
+      "error": "",
+      "raw": null
+    }
+  ]
+}

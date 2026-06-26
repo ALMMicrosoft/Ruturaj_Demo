@@ -1,0 +1,26 @@
+{
+  "project": "Example Project",
+  "tools": {
+    "github-copilot": {
+      "githubKey": "ghp_or_fine_grained_pat_with_copilot_admin_read",
+      "org": "your-org-login",
+      "scope": "org"
+    },
+    "github": {
+      "githubKey": "ghp_pat_with_repo_read",
+      "owner": "your-org-or-user",
+      "repo": "your-repo"
+    },
+    "jira": {
+      "apiToken": "ATATT_api_token",
+      "email": "you@example.com",
+      "site": "your-site.atlassian.net",
+      "projectKey": "ABC",
+      "boardId": "123"
+    },
+    "claude": {
+      "adminKey": "sk-ant-admin01-...",
+      "workspaceId": ""
+    }
+  }
+}

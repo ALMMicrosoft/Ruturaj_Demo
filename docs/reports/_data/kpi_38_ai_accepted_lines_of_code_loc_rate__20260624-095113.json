@@ -1,0 +1,54 @@
+{
+  "module": "kpi_38_ai_accepted_lines_of_code_loc_rate",
+  "project": "Cybage — ALMCybage",
+  "generatedAt": "2026-06-24 09:51:13",
+  "argv": [],
+  "kpi": {
+    "num": 38,
+    "name": "AI-Accepted Lines of Code (LOC) Rate",
+    "index": "Utilization",
+    "definition": "% of AI-suggested lines of code that developers accept and retain.",
+    "how_measured": "accepted LOC / suggested LOC * 100 per sprint, per language, per dev.",
+    "formula": "(AI-accepted LOC / AI-suggested LOC) x 100",
+    "unit": "%",
+    "cadence": "Weekly",
+    "direction": "higher-better",
+    "interpretation": "<15%=Poor; 15-25%=Industry average; 25-35%=Good; >35%=Excellent",
+    "tools": "GitHub Copilot",
+    "plain": "Of every line of code Copilot offered, what share did developers accept?",
+    "steps": [
+      "Fetch the org 28-day report.",
+      "Sum loc_added_sum across day_totals[].totals_by_feature[] -> numerator.",
+      "Sum loc_suggested_to_add_sum across same path -> denominator.",
+      "Result = numerator / denominator * 100."
+    ]
+  },
+  "computable": false,
+  "result": null,
+  "datapoints": [
+    {
+      "label": "AI-accepted LOC",
+      "source": "org-28-day report -> sum(day_totals[].totals_by_feature[].loc_added_sum)",
+      "value": null,
+      "ok": false,
+      "error": "",
+      "raw": null
+    },
+    {
+      "label": "AI-suggested LOC",
+      "source": "org-28-day report -> sum(...loc_suggested_to_add_sum)",
+      "value": null,
+      "ok": false,
+      "error": "",
+      "raw": null
+    },
+    {
+      "label": "Per-user JSONL row count",
+      "source": "users-28-day report -> JSONL list of per-user-per-day rows",
+      "value": null,
+      "ok": false,
+      "error": "",
+      "raw": null
+    }
+  ]
+}

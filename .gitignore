@@ -1,0 +1,35 @@
+# ── Secrets ──────────────────────────────────────────────────────────────
+# The project's real credentials live here, never committed.
+.secrets/
+# Any stray credential files (the tracked example is project.config.example.json).
+project.json
+*.token
+*.pat
+*-key.txt
+*.pem
+.env
+.env.*
+
+# ── Python ───────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Office / editor lock & temp files (docs/ holds .xlsx) ────────────────
+~$*
+*.tmp
+*.bak
+
+# ── OS / crash artifacts ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.stackdump
+*.log
+/data
+docs/kpi_08_calculation_methodology.md
+docs/kpi_08_exclusions.md
+docs/kpi_08_features_explain.md

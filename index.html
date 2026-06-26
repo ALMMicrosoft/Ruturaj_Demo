@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KPI Verifier</title>
+<style>
+/* ===== Cobalt design tokens (from the design handoff bundle) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{
+  --white:#fff;--slate-25:#fbfcfe;--slate-50:#f6f8fb;--slate-100:#eef1f6;--slate-150:#e4e8f0;
+  --slate-200:#d7dce6;--slate-300:#bcc4d4;--slate-400:#97a1b5;--slate-500:#6b7488;--slate-600:#4d5567;
+  --slate-700:#39414f;--slate-800:#232a36;--slate-900:#161b24;
+  --cobalt-50:#edf0ff;--cobalt-100:#dce2ff;--cobalt-200:#bfc9ff;--cobalt-400:#6c7cfb;--cobalt-500:#4a5cf0;
+  --cobalt-600:#3a4ce0;--cobalt-700:#2f3cc0;--cobalt-800:#29349a;
+  --green-50:#e7f6ef;--green-600:#15885a;--green-700:#116e49;
+  --amber-50:#fdf3e2;--amber-600:#b8740a;--amber-700:#935d0b;
+  --red-50:#fdecef;--red-600:#c52f47;
+  --surface-page:var(--slate-50);--surface-card:var(--white);--surface-sunken:var(--slate-100);
+  --surface-hover:var(--slate-100);--surface-accent-subtle:var(--cobalt-50);
+  --text-strong:var(--slate-900);--text-body:var(--slate-700);--text-muted:var(--slate-500);
+  --text-subtle:var(--slate-400);--text-accent:var(--cobalt-600);
+  --border-subtle:var(--slate-150);--border-default:var(--slate-200);--border-strong:var(--slate-300);
+  --accent:var(--cobalt-600);--accent-hover:var(--cobalt-700);
+  --success:var(--green-600);--warning:var(--amber-600);--danger:var(--red-600);
+  --focus-ring:0 0 0 3px color-mix(in srgb, var(--cobalt-500) 32%, transparent);
+  --font-sans:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --radius-sm:5px;--radius-md:7px;--radius-lg:10px;--radius-xl:14px;--radius-2xl:20px;--radius-full:9999px;
+  --topbar-h:56px;--sidebar-w:300px;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans);font-size:14px;line-height:1.5;color:var(--text-body);background:var(--surface-page);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;color:var(--text-strong);font-weight:700;line-height:1.15;letter-spacing:-0.01em}
+code,pre{font-family:var(--font-mono)}
+a{color:var(--text-accent);text-decoration:none}
+*{scrollbar-width:thin;scrollbar-color:var(--slate-300) transparent}
+*::-webkit-scrollbar{width:10px;height:10px}*::-webkit-scrollbar-thumb{background:var(--slate-300);border-radius:9999px;border:2px solid transparent;background-clip:content-box}
+
+/* ===== layout ===== */
+.topbar{height:var(--topbar-h);display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--surface-card);border-bottom:1.5px solid var(--border-default);position:sticky;top:0;z-index:10}
+.brand{font-weight:800;letter-spacing:-0.02em;color:var(--text-strong);font-size:16px}
+.brand b{color:var(--accent)}
+.brand span{color:var(--text-muted);font-weight:500;font-size:13px}
+.chip{margin-left:auto;font-size:12px;font-weight:500;color:var(--text-muted);border:1.5px solid var(--border-default);border-radius:9999px;padding:4px 12px}
+.shell{display:flex;min-height:calc(100vh - var(--topbar-h))}
+.sidebar{width:var(--sidebar-w);flex:none;border-right:1.5px solid var(--border-default);background:var(--surface-card);padding:14px 10px;overflow-y:auto;max-height:calc(100vh - var(--topbar-h))}
+.main{flex:1;min-width:0;padding:24px 28px 80px;max-width:1100px}
+
+/* ===== sidebar nav ===== */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);padding:14px 10px 6px}
+.nav-item{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;color:var(--text-body);padding:7px 10px;border-radius:var(--radius-md);cursor:pointer;font-size:13px;font-weight:500}
+.nav-item:hover{background:var(--surface-hover)}
+.nav-item.active{background:var(--cobalt-50);color:var(--accent);font-weight:600}
+.nav-item .n{color:var(--text-subtle);font-family:var(--font-mono);font-size:12px;margin-right:6px}
+
+/* ===== kpi header ===== */
+.kpi-head{margin-bottom:18px}
+.kpi-head h1{font-size:24px}
+.kpi-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:9999px;border:1.5px solid var(--border-default);color:var(--text-muted)}
+.tag.accent{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:var(--cobalt-50)}
+.def{color:var(--text-muted);font-size:14px;margin-top:6px;max-width:80ch}
+.formula{display:block;font-family:var(--font-mono);font-size:13px;background:var(--surface-sunken);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:11px 13px;margin:12px 0;color:var(--text-strong);white-space:pre-wrap}
+
+/* ===== buttons ===== */
+.btn{font:inherit;font-size:14px;font-weight:600;background:var(--accent);color:#fff;border:0;border-radius:var(--radius-lg);padding:9px 18px;cursor:pointer;transition:transform .04s,filter .15s}
+.btn:hover{background:var(--accent-hover)}.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:transparent;color:var(--text-body);border:1.5px solid var(--border-default)}
+.btn.sm{font-size:12px;padding:5px 11px;border-radius:var(--radius-md)}
+.btn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+
+/* ===== result / value ===== */
+.result-card{display:flex;align-items:center;gap:16px;border:1.5px solid var(--border-default);background:var(--surface-card);border-radius:var(--radius-2xl);padding:16px 20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.result-val{font-size:34px;font-weight:800;letter-spacing:-0.02em;line-height:1}
+.result-val.ok{color:var(--accent)}.result-val.no{color:var(--text-subtle);font-size:18px}
+.result-sub{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-top:4px}
+.blocker{border:1.5px solid color-mix(in srgb,var(--warning) 45%,transparent);background:var(--amber-50);color:var(--text-body);border-radius:var(--radius-lg);padding:10px 13px;font-size:13px;margin-top:10px}
+
+/* ===== datapoint card ===== */
+.dp{border:1.5px solid var(--border-default);border-radius:var(--radius-xl);margin:14px 0;overflow:hidden;background:var(--surface-card)}
+.dp-hd{padding:13px 16px;background:var(--surface-card)}
+.dp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dp-title{font-weight:700;color:var(--text-strong);font-size:15px}
+.kv{margin:8px 0 0;display:grid;grid-template-columns:84px 1fr;gap:3px 12px;font-size:13px}
+.kv dt{color:var(--text-muted)}.kv dd{margin:0;color:var(--text-body)}
+.mono{font-family:var(--font-mono);font-size:12px}
+.method{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--success);border:1.5px solid color-mix(in srgb,var(--success) 40%,transparent);border-radius:5px;padding:1px 6px}
+.val-chip{display:inline-block;font-family:var(--font-mono);font-weight:700;background:var(--cobalt-50);color:var(--accent);border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:var(--radius-md);padding:2px 9px}
+.note{font-size:12px;color:var(--amber-700);margin:6px 0}
+.err{color:var(--danger);font-size:13px;font-weight:500}
+.what{color:var(--text-body);font-size:13px;margin-top:4px}
+.eg{color:var(--text-muted);font-size:12.5px;margin-top:3px;font-style:italic}
+.plain{font-size:13.5px;color:var(--text-strong);background:var(--surface-accent-subtle);border:1.5px solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:var(--radius-md);padding:7px 11px;margin:8px 0 2px}
+.plain-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-right:7px;vertical-align:1px}
+.steps{margin-top:10px;background:var(--surface-sunken);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:9px 12px}
+.steps-h,.calc-h{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.steps ol,.calc ol{margin:0;padding-left:20px}
+.steps li,.calc li{margin:3px 0;font-size:13px;color:var(--text-body)}
+.calc{border:1.5px solid var(--border-default);background:var(--surface-card);border-radius:var(--radius-2xl);padding:14px 18px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.calc ul{margin:4px 0;padding-left:18px}.calc ul li{color:var(--text-muted)}
+.calc code{background:var(--surface-sunken);padding:1px 6px;border-radius:5px;font-size:12px;font-family:var(--font-mono)}
+.calc b{color:var(--accent)}
+
+/* ===== json viewer ===== */
+.json-wrap{border-top:1.5px solid var(--border-subtle);background:var(--slate-25)}
+.json-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;border-bottom:1.5px solid var(--border-subtle);font-size:12px;color:var(--text-muted)}
+.json-legend{margin-left:auto;display:flex;align-items:center;gap:6px}
+.swatch{width:13px;height:13px;border-radius:3px;background:var(--cobalt-100);border:1.5px solid var(--accent)}
+.jb-title{font-weight:700;color:var(--text-strong);font-size:12px}
+.api-call{border-top:1px dashed var(--border-default)}
+.api-call:first-child{border-top:0}
+.api-call-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 14px 0;font-size:12px;color:var(--text-muted)}
+.json{font-family:var(--font-mono);font-size:12.5px;line-height:1.55;padding:12px 14px;overflow:auto;max-height:460px;color:var(--text-body)}
+.json details{margin:0}
+.json summary{cursor:pointer;list-style:none;color:var(--text-muted)}
+.json summary::-webkit-details-marker{display:none}
+.json summary::before{content:'\25B8';display:inline-block;width:1em;color:var(--text-subtle);transition:transform .1s}
+.json details[open]>summary::before{transform:rotate(90deg)}
+.json .children{margin-left:1.1em;border-left:1px solid var(--border-subtle);padding-left:.7em}
+.json .row{white-space:pre-wrap;word-break:break-word}
+.json .k{color:var(--cobalt-700)}
+.json .num{color:var(--accent)}.json .str{color:var(--green-700)}.json .bool{color:var(--amber-700)}.json .null{color:var(--text-subtle)}
+.json .tok,.json .muted{color:var(--text-subtle)}
+.json .hl{background:var(--cobalt-100);outline:1.5px solid var(--accent);border-radius:3px;padding:0 2px;font-weight:700}
+.json .k.hl{background:var(--cobalt-100);outline:1.5px solid var(--accent);border-radius:3px;padding:0 2px}
+.json summary.hl{background:color-mix(in srgb,var(--cobalt-100) 60%,transparent);border-radius:3px}
+
+.empty{color:var(--text-muted);padding:40px 0;text-align:center}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid var(--cobalt-200);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== responsive ===== */
+.menu-btn{display:none;background:none;border:1.5px solid var(--border-default);border-radius:var(--radius-md);font-size:18px;line-height:1;padding:4px 11px;cursor:pointer;color:var(--text-body)}
+.menu-btn:hover{background:var(--surface-hover)}
+.backdrop{display:none}
+.main{width:100%}
+.json{overscroll-behavior:contain}
+@media (max-width:900px){
+  :root{--sidebar-w:264px}
+  .menu-btn{display:inline-block}
+  .brand span{display:none}
+  .sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);max-height:none;z-index:30;transform:translateX(-100%);transition:transform .18s ease;box-shadow:0 10px 34px rgba(12,15,21,.16)}
+  body.nav-open .sidebar{transform:none}
+  body.nav-open .backdrop{display:block;position:fixed;inset:var(--topbar-h) 0 0 0;background:rgba(12,15,21,.34);z-index:20}
+  .main{padding:18px 16px 64px;max-width:none}
+}
+@media (max-width:560px){
+  .topbar{padding:0 12px;gap:8px}
+  .chip{padding:3px 9px;font-size:11px}
+  .kv{grid-template-columns:1fr;gap:0}
+  .kv dt{margin-top:7px;font-weight:600}
+  .result-card{flex-wrap:wrap;padding:14px}
+  .result-val{font-size:26px}
+  .kpi-head h1{font-size:20px}
+  .json{font-size:12px;max-height:60vh}
+  .json-bar{flex-wrap:wrap}
+  .btn{padding:8px 14px}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="menu-btn" id="menu" aria-label="Toggle KPI list">☰</button>
+  <div class="brand">KPI <b>Verifier</b> &nbsp;<span>generate &amp; verify each KPI against source</span></div>
+  <div class="chip" id="project">…</div>
+</div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar"><nav id="nav"></nav></aside>
+  <main class="main" id="main"><div class="empty">Select a KPI, then <b>Generate live</b>.</div></main>
+</div>
+<div class="backdrop" id="backdrop"></div>
+
+<script>
+const API = location.origin;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let KPIS = [];
+
+async function init(){
+  try{
+    const p = await fetch(API+'/api/project').then(r=>r.json());
+    document.getElementById('project').textContent = p.project ? ('project: '+p.project) : 'no project configured';
+  }catch(e){ document.getElementById('project').textContent='backend offline'; }
+  KPIS = await fetch(API+'/api/kpis').then(r=>r.json());
+  renderNav();
+}
+
+function renderNav(){
+  const order=['Adoption','Utilization','Quality','Velocity','Outcome'];
+  const groups={};
+  KPIS.forEach(k=>{(groups[k.index||'Other']=groups[k.index||'Other']||[]).push(k);});
+  const idxs=Object.keys(groups).sort((a,b)=>{const ia=order.indexOf(a),ib=order.indexOf(b);return (ia<0?9:ia)-(ib<0?9:ib);});
+  let h='';
+  idxs.forEach(idx=>{
+    h+=`<div class="eyebrow">${esc(idx)}</div>`;
+    groups[idx].forEach(k=>{ h+=`<button class="nav-item" data-id="${k.id}"><span class="n">#${k.num}</span>${esc(k.name)}</button>`; });
+  });
+  const nav=document.getElementById('nav'); nav.innerHTML=h;
+  nav.querySelectorAll('.nav-item').forEach(b=>b.onclick=()=>select(b.dataset.id,b));
+}
+
+function select(id,btn){
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.classList.remove('nav-open');
+  const k=KPIS.find(x=>x.id===id);
+  const m=document.getElementById('main');
+  m.innerHTML=`
+    <div class="kpi-head">
+      <h1>#${k.num} ${esc(k.name)}</h1>
+      <div class="kpi-meta">
+        <span class="tag accent">${esc(k.index||'')} index</span>
+        <span class="tag">${esc(k.tools||'')}</span>
+        <span class="tag">${esc(k.cadence||'')}</span>
+        <span class="tag">unit: ${esc(k.unit||'')}</span>
+      </div>
+      ${k.plain?`<p class="plain"><span class="plain-tag">In plain English</span> ${esc(k.plain)}</p>`:''}
+      <p class="def">${esc(k.definition||'')}</p>
+      <code class="formula">${esc(k.formula||'')}</code>
+      ${k.how_measured?`<p class="def"><b>How measured:</b> ${esc(k.how_measured)}</p>`:''}
+      ${k.interpretation?`<p class="def"><b>Interpretation:</b> ${esc(k.interpretation)}</p>`:''}
+    </div>
+    <button class="btn" id="gen">Generate live</button>
+    <div id="result"></div>`;
+  document.getElementById('gen').onclick=()=>generate(k);
+}
+
+async function generate(k){
+  const btn=document.getElementById('gen'), out=document.getElementById('result');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating…';
+  out.innerHTML='';
+  try{
+    const res=await fetch(API+'/api/run/'+k.id,{method:'POST'}).then(r=>r.json());
+    renderResult(res,out);
+  }catch(e){ out.innerHTML=`<p class="err">Request failed: ${esc(e.message||e)}</p>`; }
+  btn.disabled=false; btn.textContent='Generate live';
+}
+
+function renderResult(res,out){
+  if(res.error && !res.datapoints){ out.innerHTML=`<p class="err">${esc(res.error)}</p>`; return; }
+  const unit=res.kpi.unit||'';
+  let h=`<div class="result-card">`;
+  if(res.computable && res.result!=null){
+    h+=`<div><div class="result-val ok">${fmt(res.result,unit)}</div><div class="result-sub">${esc(res.kpi.formula||'')}</div></div>`;
+  }else{
+    h+=`<div><div class="result-val no">NOT COMPUTABLE</div><div class="result-sub">${esc(res.kpi.formula||'')}</div></div>`;
+  }
+  h+=`</div>`;
+  if(!(res.computable&&res.result!=null)){
+    const bad=(res.datapoints||[]).find(d=>!d.ok);
+    if(bad) h+=`<div class="blocker"><b>Blocker:</b> ${esc(bad.label)} — ${esc(bad.error||'did not resolve')}</div>`;
+  }
+  h+=renderCalc(res);
+  (res.datapoints||[]).forEach((d,i)=>h+=renderDp(d,i));
+  out.innerHTML=h;
+  out.querySelectorAll('[data-expand]').forEach(b=>b.onclick=()=>{
+    const open=b.dataset.expand==='1';
+    b.closest('.json-wrap').querySelectorAll('details').forEach(x=>x.open=open);
+  });
+}
+
+function renderCalc(res){
+  const dps=res.datapoints||[], kpi=res.kpi;
+  let h=`<div class="calc"><div class="calc-h">How this KPI is calculated — step by step</div><ol>`;
+  dps.forEach(d=>{ h+=`<li>${esc(d.label)} = <b>${d.value!=null?esc(d.value):'—'}</b></li>`; });
+  h+=`<li>Apply the formula: <code>${esc(kpi.formula||'')}</code>`;
+  if(kpi.steps&&kpi.steps.length) h+=`<ul>${kpi.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`;
+  h+=`</li>`;
+  if(res.computable&&res.result!=null) h+=`<li>Result = <b>${esc(fmt(res.result,kpi.unit||''))}</b></li>`;
+  else h+=`<li>Result = <b>NOT COMPUTABLE</b> (an input did not resolve)</li>`;
+  return h+`</ol></div>`;
+}
+
+function fmt(v,unit){
+  if(unit==='%') return (v<10?v.toFixed(1):Math.round(v))+'%';
+  if(unit==='hours') return Math.round(v)+' h';
+  if(typeof v==='number' && !Number.isInteger(v)) return v.toFixed(4)+(unit?' '+unit:'');
+  return v.toLocaleString()+(unit&&unit!=='%'?' '+unit:'');
+}
+
+function renderDp(d,i){
+  const paths=d.paths||[];
+  let h=`<div class="dp"><div class="dp-hd">
+    <div class="dp-row"><span class="dp-title">[${i+1}] ${esc(d.label)}</span>
+      <span class="tag ${d.availability==='live'?'accent':''}">${esc(d.availability)}</span>
+      ${d.value!=null?`<span class="val-chip">value = ${esc(d.value)}</span>`:''}
+      ${d.status?`<span class="tag">HTTP ${d.status}</span>`:''}
+    </div>`;
+  if(d.plain) h+=`<div class="plain"><span class="plain-tag">In plain English</span> ${esc(d.plain)}</div>`;
+  if(d.description) h+=`<div class="what"><b>what:</b> ${esc(d.description)}</div>`;
+  if(d.example) h+=`<div class="eg">${esc(d.example)}</div>`;
+  h+=`<dl class="kv"><dt>source</dt><dd class="mono">${esc(d.source||'')}</dd>`;
+  if(paths.length) h+=`<dt>reads</dt><dd class="mono">${paths.map(esc).join('  ·  ')}</dd>`;
+  if(d.request) h+=`<dt>request</dt><dd class="mono"><span class="method">${esc(d.request.method)}</span> ${esc(d.request.url)}</dd>`;
+  h+=`</dl>`;
+  if(d.error) h+=`<p class="err">⚠ ${esc(d.error)}</p>`;
+  if(d.request&&d.request.note) h+=`<p class="note">ℹ ${esc(d.request.note)}</p>`;
+  if(d.steps&&d.steps.length){
+    h+=`<div class="steps"><div class="steps-h">Logic — how this value is calculated</div><ol>${d.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></div>`;
+  }
+  h+=`</div>`;
+  // 1) the ACTUAL raw API responses this datapoint received (one block per real call)
+  if(d.api_calls && d.api_calls.length){
+    let calls='';
+    d.api_calls.forEach(ac=>{
+      calls+=`<div class="api-call"><div class="api-call-hd"><span class="method">${esc(ac.method)}</span> <span class="mono">${esc(ac.url)}</span>${ac.status!=null?` <span class="tag">HTTP ${esc(ac.status)}</span>`:''}</div>`;
+      if(ac.note) calls+=`<p class="note">ℹ ${esc(ac.note)}</p>`;
+      calls+=`<div class="json">${renderJsonRoot(ac.response,paths)}</div></div>`;
+    });
+    h+=`<div class="json-wrap"><div class="json-bar"><span class="jb-title">Actual API response${d.api_calls.length>1?'s':''} — ${d.api_calls.length} real upstream call${d.api_calls.length>1?'s':''}</span><button class="btn ghost sm" data-expand="1">Expand all</button><button class="btn ghost sm" data-expand="0">Collapse all</button><span class="json-legend"><span class="swatch"></span> highlighted = used</span></div>${calls}</div>`;
+  }
+  // 2) the COMPUTED summary - only when the script built one (differs from the last raw response)
+  const lastResp=(d.api_calls&&d.api_calls.length)?d.api_calls[d.api_calls.length-1].response:undefined;
+  let isComputed=false; try{ isComputed=d.raw!=null && JSON.stringify(d.raw)!==JSON.stringify(lastResp); }catch(e){ isComputed=d.raw!=null; }
+  if(isComputed){
+    h+=`<div class="json-wrap"><div class="json-bar"><span class="jb-title">Computed summary — built by the script from the responses above</span><button class="btn ghost sm" data-expand="1">Expand all</button><button class="btn ghost sm" data-expand="0">Collapse all</button><span class="json-legend"><span class="swatch"></span> highlighted = used as this datapoint's value</span></div><div class="json">${renderJsonRoot(d.raw,paths)}</div></div>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+
+/* ---- JSON tree with path highlighting ---- */
+function normPath(parts){
+  let s='';
+  for(const p of parts){ if(typeof p==='number'){ s+='[]'; } else { s+=(s?'.':'')+p; } }
+  return s;
+}
+function renderJsonRoot(value,paths){
+  const set=new Set(paths||[]);
+  return renderNode(value,[],set).html;
+}
+function renderNode(v,parts,set){
+  const hit=set.has(normPath(parts));
+  if(v===null||v===undefined) return {html:`<span class="null${hit?' hl':''}">null</span>`,hl:hit};
+  if(Array.isArray(v)){
+    let inner='',childHL=false;
+    for(let i=0;i<v.length;i++){ const r=renderNode(v[i],parts.concat(i),set); inner+=`<div class="row">${r.html}</div>`; childHL=childHL||r.hl; }
+    const hl=hit||childHL, open=hl||v.length<=8;
+    return {html:container('[ ]',`Array(${v.length})`,inner,open,hit),hl};
+  }
+  if(typeof v==='object'){
+    let inner='',childHL=false; const keys=Object.keys(v);
+    for(const key of keys){
+      const cp=parts.concat(key), khit=set.has(normPath(cp));
+      const r=renderNode(v[key],cp,set);
+      inner+=`<div class="row"><span class="k${khit?' hl':''}">${esc(key)}</span><span class="tok">: </span>${r.html}</div>`;
+      childHL=childHL||r.hl||khit;
+    }
+    const hl=hit||childHL, open=hl||keys.length<=40;
+    return {html:container('{ }',`${keys.length} keys`,inner,open,hit),hl};
+  }
+  const cls=typeof v==='number'?'num':(typeof v==='boolean'?'bool':'str');
+  const disp=typeof v==='string'?`"${esc(v)}"`:esc(String(v));
+  return {html:`<span class="${cls}${hit?' hl':''}">${disp}</span>`,hl:hit};
+}
+function container(tok,summary,inner,open,hit){
+  return `<details ${open?'open':''}><summary class="${hit?'hl':''}"><span class="tok">${tok}</span> <span class="muted">${summary}</span></summary><div class="children">${inner}</div></details>`;
+}
+
+document.getElementById('menu').onclick=()=>document.body.classList.toggle('nav-open');
+document.getElementById('backdrop').onclick=()=>document.body.classList.remove('nav-open');
+addEventListener('keydown',e=>{ if(e.key==='Escape') document.body.classList.remove('nav-open'); });
+init();
+</script>
+</body>
+</html>

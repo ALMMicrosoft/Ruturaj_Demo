@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python kpi_38_ai_accepted_lines_of_code_loc_rate.py)",
+      "Read(///172.27.59.130/Users/ruturajkh/Desktop/sharable/**)",
+      "Bash(python -m py_compile kpi_17.py)"
+    ]
+  }
+}

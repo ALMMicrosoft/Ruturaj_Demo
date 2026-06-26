@@ -1,0 +1,12 @@
+[
+  {
+    "title": "PER-DEVELOPER BREAKDOWN (28-day window)",
+    "label_field": "developer",
+    "rows": [],
+    "total": {
+      "suggested": 0,
+      "accepted": 0,
+      "rate_pct": null
+    }
+  }
+]

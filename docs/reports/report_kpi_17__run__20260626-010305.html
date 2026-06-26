@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>KPI #17 &mdash; Rework Rate (AI-Attributed)</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font: 12px/1.5 -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #1a1a1a; }
+  h1 { font-size: 20px; margin: 0 0 2px; }
+  h2 { font-size: 14px; margin: 22px 0 8px; border-bottom: 2px solid #2563eb;
+       padding-bottom: 4px; color: #1e3a8a; }
+  h3 { font-size: 13px; margin: 16px 0 6px; color:#1e3a8a; }
+  .meta { color: #666; font-size: 11px; margin-bottom: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 4px 0 10px; }
+  .grid th, .grid td { border: 1px solid #d7dbe0; padding: 4px 8px; }
+  .grid th { background:#f1f5f9; text-align:left; font-weight:600; }
+  .grid tbody tr:nth-child(even) { background:#fafbfc; }
+  .grid tfoot td { border-top: 2px solid #94a3b8; background:#f8fafc; color:#666; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .kv td { padding: 3px 8px; border:1px solid #eef0f3; vertical-align: top; }
+  .kv .k { color:#555; width: 230px; }
+  .kv .v { font-weight:500; }
+  .item { margin: 4px 0 4px 10px; }
+  .item .ik { color:#888; font-size:10px; }
+  .null { color:#aaa; }
+  .def { background:#f8fafc; border:1px solid #e5e7eb; border-radius:6px;
+         padding:10px 12px; font-size:11px; color:#333; }
+  .result { background:#1e3a8a; color:#fff; font-weight:600; padding:8px 12px;
+            border-radius:6px; font-size:13px; }
+  .result .rmeta { font-weight:400; opacity:0.8; font-size:11px; }
+  .result.warn { background:#b91c1c; }
+  .formula { font-size:11px; color:#333; background:#f8fafc; border:1px solid #e5e7eb;
+             border-radius:6px; padding:8px 12px; }
+  .tag { font-size:10px; padding:1px 7px; border-radius:10px; font-weight:600;
+         text-transform:uppercase; }
+  .tag-active { background:#dcfce7; color:#166534; }
+  .tag-closed { background:#e0e7ff; color:#3730a3; }
+  .tag-future { background:#fef3c7; color:#92400e; }
+  .foot { margin-top:18px; color:#888; font-size:10px;
+          border-top:1px solid #e5e7eb; padding-top:6px; }
+</style></head><body>
+<h1>KPI #17 &mdash; Rework Rate (AI-Attributed)</h1><div class='meta'>Quality index &middot; Unit: % &middot; Cadence: Weekly &middot; Source: GitHub (PRs/Commits/Compare). AI attribution + rework baseline are documented PROXIES; the spec methodology is In-Progress. &middot; Generated 2026-06-26 01:03:05</div><div class='meta'>Project: Cybage — ALMCybage</div>
+<h2>Definition</h2><div class='def'>% of AI-assisted code changes that require substantial revision shortly after creation (&gt;50% of the original lines reworked within 48h), indicating poor first-pass AI code quality.<br><br><b>How measured:</b> Identify AI-assisted PRs where &gt;50% of the original lines were changed/deleted within 48 hours; divide by total AI-assisted PRs x 100.<br><br><b>Formula:</b> (AI-assisted PRs with &gt;50% line rework within 48h / Total AI-assisted PRs) x 100<br><br><b>Interpretation:</b> &lt;5%=Excellent; 5-10%=Acceptable; 10-15%=Needs improvement; &gt;15%=Critical</div>
+<h2>Result</h2><div class='result'>Rework Rate (AI-Attributed) = 13.1579 % &mdash; <b>Needs improvement</b><span class='rmeta'></span></div>
+<h3>Organization</h3><table class='grid'><thead><tr><th>Org name</th><th>Repo Count</th><th>Total PR's</th><th>PR qualified (&gt;50% rework)</th><th>Formula</th><th>Interpretation</th></tr></thead><tbody><tr><td>ALMMicrosoft</td><td class='num'>9</td><td class='num'>38</td><td class='num'>5</td><td>5 / 38 &times; 100 = 13.2%</td><td>Needs improvement</td></tr></tbody></table><h3>Repository</h3><table class='grid'><thead><tr><th>Repo Name</th><th>PR's</th><th>PR qualified (&gt;50% rework in 48 hrs)</th><th>Formula</th><th>Interpretation</th></tr></thead><tbody><tr><td>kpi-verify-kpi-18_poc</td><td class='num'>29</td><td class='num'>2</td><td>2 / 29 &times; 100 = 6.9%</td><td>Acceptable</td></tr><tr><td>DemoApp_RM</td><td class='num'>2</td><td class='num'>1</td><td>1 / 2 &times; 100 = 50.0%</td><td>Critical</td></tr><tr><td>dotnetappPOCAK</td><td class='num'>5</td><td class='num'>1</td><td>1 / 5 &times; 100 = 20.0%</td><td>Critical</td></tr><tr><td>copilotPOCAK</td><td class='num'>2</td><td class='num'>1</td><td>1 / 2 &times; 100 = 50.0%</td><td>Critical</td></tr></tbody></table>
+<div class="foot">Generated from run data 2026-06-26 01:03:05 &middot; module kpi_17 &middot; rendered by export_pdf.py</div>
+</body></html>

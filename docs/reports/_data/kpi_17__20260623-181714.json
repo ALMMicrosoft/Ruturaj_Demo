@@ -1,0 +1,48 @@
+{
+  "module": "kpi_17",
+  "project": "Cybage — ALMCybage",
+  "generatedAt": "2026-06-23 18:17:14",
+  "argv": [],
+  "kpi": {
+    "num": 17,
+    "name": "Rework Rate (AI-Attributed)",
+    "index": "Quality",
+    "definition": "% of AI-assisted PRs needing substantial revision (>50% of lines reworked) within 48 hours of creation - poor first-pass AI quality.",
+    "how_measured": "Of AI-assisted PRs, count those whose follow-up commits within 48h change >50% of the original lines; divide by total AI-assisted PRs x 100.",
+    "formula": "(AI-assisted PRs with >50% line rework within 48h / Total AI-assisted PRs) x 100",
+    "unit": "%",
+    "cadence": "Weekly",
+    "direction": "lower-better",
+    "interpretation": "<5%=Excellent; 5-10%=Acceptable; 10-15%=Needs improvement; >15%=Critical",
+    "tools": "GitHub Copilot, GitHub PRs/Commits/Compare API",
+    "plain": "Of AI-written PRs, how many had to be heavily rewritten within 2 days?",
+    "steps": [
+      "Identify Copilot-active developers from the Copilot metrics report.",
+      "Collect merged PRs in the period authored by those developers (= AI-assisted PRs).",
+      "For each PR, take its added lines as the baseline.",
+      "Find follow-up commits within 48h of merge and measure lines changed (Compare API).",
+      "Mark a PR reworked if changed/baseline > 50%.",
+      "Result = reworked PRs / total AI-assisted PRs * 100."
+    ]
+  },
+  "computable": false,
+  "result": null,
+  "datapoints": [
+    {
+      "label": "Total AI-assisted PRs",
+      "source": "GitHub Pulls API, filtered to merged PRs by Copilot-active authors.",
+      "value": null,
+      "ok": false,
+      "error": "Methodology not yet confirmed: how an 'AI-assisted PR' is identified (Copilot-active author vs. AI commit tags / PR labels / LinearB) and the rework calculation must be agreed. API/tooling is TBD in the spec.",
+      "raw": null
+    },
+    {
+      "label": "AI-assisted PRs reworked >50% within 48h",
+      "source": "GitHub Commits + Compare API, line-delta vs. each PR's added lines.",
+      "value": null,
+      "ok": false,
+      "error": "Methodology not yet confirmed: how an 'AI-assisted PR' is identified (Copilot-active author vs. AI commit tags / PR labels / LinearB) and the rework calculation must be agreed. API/tooling is TBD in the spec.",
+      "raw": null
+    }
+  ]
+}
