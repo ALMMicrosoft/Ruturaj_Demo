@@ -42,7 +42,7 @@ public class Demo {
             case "*":
                 return a * b;
             case "/":
-                return Math.abs(b) < 1e-9 ? null : a / b;
+                return Math.abs(b) < 1e-10 ? null : a / b;
             default:
                 return null;
         }
