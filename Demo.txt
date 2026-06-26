@@ -1,50 +1,50 @@
 public class Demo {
     public static void main(String[] args) {
-        try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
-            System.out.println("Simple Calculator");
-            System.out.print("Enter first number: ");
-            if (!scanner.hasNextDouble()) { System.out.println("Invalid first number."); return; }
-            double first = scanner.nextDouble();
-            System.out.print("Enter second number: ");
-            if (!scanner.hasNextDouble()) { System.out.println("Invalid second number."); return; }
-            double second = scanner.nextDouble();
-            System.out.println("Choose operation:");
-            System.out.println("1. Add");
-            System.out.println("2. Subtract");
-            System.out.println("3. Multiply");
-            System.out.println("4. Divide");
-            System.out.print("Enter choice (1-4): ");
-            if (!scanner.hasNextInt()) { System.out.println("Invalid choice."); return; }
-            int choice = scanner.nextInt();
-            double result;
-            boolean valid = true;
-            switch (choice) {
-                case 1:
-                    result = first + second;
-                    break;
-                case 2:
-                    result = first - second;
-                    break;
-                case 3:
-                    result = first * second;
-                    break;
-                case 4:
-                    if (Math.abs(second) < 1e-10) {
-                        System.out.println("Error: Division by zero is not allowed.");
-                        valid = false;
-                        result = 0;
-                    } else {
-                        result = first / second;
-                    }
-                    break;
-                default:
+        try (java.util.Scanner in = new java.util.Scanner(System.in)) {
+            System.out.println("Calculator Reworked");
+            double left = readDouble(in, "Enter first number: ", "Invalid first number.");
+            if (Double.isNaN(left)) { return; }
+            double right = readDouble(in, "Enter second number: ", "Invalid second number.");
+            if (Double.isNaN(right)) { return; }
+            System.out.println("Select operation: +, -, *, /");
+            System.out.print("Enter operator: ");
+            if (!in.hasNext()) { System.out.println("Invalid choice."); return; }
+            String op = in.next().trim();
+            Double output = calculate(left, right, op);
+            if (output == null) {
+                if ("/".equals(op) && Math.abs(right) < 1e-9) {
+                    System.out.println("Error: Division by zero is not allowed.");
+                } else {
                     System.out.println("Invalid choice.");
-                    valid = false;
-                    result = 0;
-                    break;
+                }
+                return;
             }
-            if (valid) { System.out.println("Result: " + result); }
+            System.out.println("Result: " + output);
             System.out.println("Calculator finished.");
+        }
+    }
+
+    private static double readDouble(java.util.Scanner in, String prompt, String error) {
+        System.out.print(prompt);
+        if (!in.hasNextDouble()) {
+            System.out.println(error);
+            return Double.NaN;
+        }
+        return in.nextDouble();
+    }
+
+    private static Double calculate(double a, double b, String op) {
+        switch (op) {
+            case "+":
+                return a + b;
+            case "-":
+                return a - b;
+            case "*":
+                return a * b;
+            case "/":
+                return Math.abs(b) < 1e-9 ? null : a / b;
+            default:
+                return null;
         }
     }
 }
