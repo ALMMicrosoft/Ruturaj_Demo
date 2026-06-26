@@ -1,4 +1,6 @@
 public class Demo {
+    private static final double DIVISION_EPSILON = 1e-10;
+
     public static void main(String[] args) {
         try (java.util.Scanner in = new java.util.Scanner(System.in)) {
             System.out.println("Calculator Reworked");
@@ -6,19 +8,17 @@ public class Demo {
             if (Double.isNaN(left)) { return; }
             double right = readDouble(in, "Enter second number: ", "Invalid second number.");
             if (Double.isNaN(right)) { return; }
+
             System.out.println("Select operation: +, -, *, /");
             System.out.print("Enter operator: ");
             if (!in.hasNext()) { System.out.println("No operator provided."); return; }
+
             String op = in.next().trim();
+            if (op.length() != 1 || !"+-*/".contains(op)) { System.out.println("Invalid operator."); return; }
+
             Double output = calculate(left, right, op);
-            if (output == null) {
-                if ("/".equals(op)) {
-                    System.out.println("Error: Division by zero is not allowed.");
-                } else {
-                    System.out.println("Invalid operator.");
-                }
-                return;
-            }
+            if (output == null) { System.out.println("Error: Division by zero is not allowed."); return; }
+
             System.out.println("Result: " + output);
             System.out.println("Calculator finished.");
         }
@@ -42,7 +42,7 @@ public class Demo {
             case "*":
                 return a * b;
             case "/":
-                return Math.abs(b) < 1e-10 ? null : a / b;
+                return Math.abs(b) < DIVISION_EPSILON ? null : a / b;
             default:
                 return null;
         }
