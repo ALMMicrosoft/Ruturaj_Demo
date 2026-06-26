@@ -15,7 +15,7 @@ public class Demo {
                 if ("/".equals(op)) {
                     System.out.println("Error: Division by zero is not allowed.");
                 } else {
-                    System.out.println("Invalid choice.");
+                    System.out.println("Invalid operator.");
                 }
                 return;
             }
