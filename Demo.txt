@@ -8,11 +8,11 @@ public class Demo {
             if (Double.isNaN(right)) { return; }
             System.out.println("Select operation: +, -, *, /");
             System.out.print("Enter operator: ");
-            if (!in.hasNext()) { System.out.println("Invalid choice."); return; }
+            if (!in.hasNext()) { System.out.println("No operator provided."); return; }
             String op = in.next().trim();
             Double output = calculate(left, right, op);
             if (output == null) {
-                if ("/".equals(op) && Math.abs(right) < 1e-9) {
+                if ("/".equals(op)) {
                     System.out.println("Error: Division by zero is not allowed.");
                 } else {
                     System.out.println("Invalid choice.");
